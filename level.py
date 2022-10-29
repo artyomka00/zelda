@@ -12,7 +12,7 @@ class Level:
 
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
-        self.create_map()
+        self.map_wight, self.map_height = self.create_map()
 
 
     def create_map(self):
@@ -24,6 +24,7 @@ class Level:
                     Tile((x,y),[self.visible_sprites, self.obstacle_sprites])
                 if col =='p':
                     self.player = Player((x,y), [self.visible_sprites],self.obstacle_sprites)
+        return len(WORLD_MAP[0]*TILESIZE), len(WORLD_MAP*TILESIZE)
 
 
     def run(self):
@@ -31,39 +32,41 @@ class Level:
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
         debug((self.player.rect.x, self.player.rect.y))
-        debug(self.visible_sprites.display_surface.get_size()[0],y=40)
-        debug((self.visible_sprites.offset.x,self.visible_sprites.surface_x) ,y=80)
+        debug(self.visible_sprites.length,y=40)
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
         self.display_surface = pygame.display.get_surface()
-        self.half_width = self.display_surface.get_size()[0] // 2
-        self.half_height = self.display_surface.get_size()[1] // 2
         self.offset = pygame.math.Vector2()
-        self.surface_y = 1
-        self.surface_x = 1
+        self.speed_screen = 40
+        self.length = 0
+        self.hieght = 0
 
-    def custom_draw(self, player):
-        if player.rect.bottom > self.display_surface.get_size()[1] * self.surface_y :
-            self.offset.y =  self.display_surface.get_size()[1] * self.surface_y
-            self.surface_y += 1
-        if player.rect.top < self.display_surface.get_size()[1] * self.surface_y :
-            self.surface_y -= 1
-            self.offset.y =  self.display_surface.get_size()[1] * self.surface_y
-
-        if player.rect.x > (self.display_surface.get_size()[0] * self.surface_x):
-            self.offset.x = self.display_surface.get_size()[0] * self.surface_x
-            self.surface_x += 1
-        if player.rect.x < (self.display_surface.get_size()[0] * (self.surface_x-1)):
-            self.surface_x -= 1
-            self.offset.x = self.display_surface.get_size()[0] * (self.surface_x-1)
-
+    def custom_draw(self, player:pygame.sprite.Sprite):
+        if player.rect.right > self.display_surface.get_size()[0]:
+            self.offset.x = -1
+        if player.rect.left < 0:
+            self.offset.x = 1
+        self.length += self.offset.x * self.speed_screen
+        if abs(self.length) >= WIDTH - TILESIZE*1.1:
+            self.length = 0
+            self.offset.x = 0
+        if player.rect.bottom > self.display_surface.get_size()[1]:
+            self.offset.y = -1
+        if player.rect.top < 0:
+            self.offset.y = 1
+        self.hieght += self.offset.y * self.speed_screen
+        if abs(self.hieght) >= HEIGTH - TILESIZE*1.1:
+            self.hieght = 0
+            self.offset.y = 0
 
         #self.offset.x = palyer.rect.centerx - self.half_width
         #self.offset.y = palyer.rect.centery - self.half_height
         for sprite in self.sprites():
-            offset_pos = sprite.rect.topleft - self.offset
-            self.display_surface.blit(sprite.image,offset_pos)
+            sprite.rect.topleft += self.offset * self.speed_screen
+            offset_pos = sprite.rect.topleft + self.offset
+            self.display_surface.blit(sprite.image,sprite.rect.topleft)
+
 
 
