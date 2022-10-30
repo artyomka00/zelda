@@ -1,11 +1,12 @@
 import pygame
 from settings import *
 from support import *
+from entity import Entity
 
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, obstacle_sprites, create_attack, destroy_attack, create_magic):
-        super().__init__(groups)
+class Player(Entity):
+    def __init__(self, pos, group, obstacle_sprites, create_attack, destroy_attack, create_magic):
+        super().__init__(group)
         self.image = pygame.image.load('graphics/test/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
         self.hitbox = self.rect.inflate(0, -26)
@@ -13,11 +14,8 @@ class Player(pygame.sprite.Sprite):
         # graphics setup
         self.import_player_assets()
         self.status = 'down'
-        self.frame_index = 0
-        self.animation_speed = 0.15
 
         # moving setup
-        self.direction = pygame.math.Vector2()
         self.attacking = False
         self.cooldawn = 400
         self.attack_time = 0
@@ -47,9 +45,6 @@ class Player(pygame.sprite.Sprite):
         self.switch_magic = True
         self.switch_magic_time = 0
         self.switch_magic_cooldown = 200
-
-
-
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -85,7 +80,7 @@ class Player(pygame.sprite.Sprite):
                 style = list(magic_data.keys())[self.magic_index]
                 strength = magic_data[style]['strength'] + self.stats['magic']
                 cost = magic_data[style]['cost']
-                self.create_magic(style,strength,cost)
+                self.create_magic(style, strength, cost)
 
             # switch weapon
             if keys[pygame.K_COMMA] and self.switch_weapon:
@@ -131,31 +126,6 @@ class Player(pygame.sprite.Sprite):
         for animation in self.animations.keys():
             full_path = character_path + animation
             self.animations[animation] = import_folder(full_path)
-
-    def move(self, speed):
-        if self.direction.magnitude() != 0:
-            self.direction = self.direction.normalize()
-        self.hitbox.x += self.direction.x * speed
-        self.collision('horizontal')
-        self.hitbox.y += self.direction.y * speed
-        self.collision('vertical')
-        self.rect.center = self.hitbox.center
-
-    def collision(self, direction):
-        if direction == 'horizontal':
-            for sprite in self.obstacle_sprites:
-                if sprite.hitbox.colliderect(self.hitbox):
-                    if self.direction.x > 0:  # движение вправо
-                        self.hitbox.right = sprite.hitbox.left
-                    if self.direction.x < 0:  # движение влево
-                        self.hitbox.left = sprite.hitbox.right
-        if direction == 'vertical':
-            for sprite in self.obstacle_sprites:
-                if sprite.hitbox.colliderect(self.hitbox):
-                    if self.direction.y < 0:  # движение вверх
-                        self.hitbox.top = sprite.hitbox.bottom
-                    if self.direction.y > 0:  # движение вниз
-                        self.hitbox.bottom = sprite.hitbox.top
 
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
