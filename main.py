@@ -20,7 +20,6 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                print(event.type)
 
             self.screen.fill('black')
             self.level.run()

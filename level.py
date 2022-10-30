@@ -1,4 +1,6 @@
 import pygame
+
+import weapon
 from settings import *
 from tile import Tile
 from player import Player
@@ -6,6 +8,7 @@ from debug import debug
 from support import *
 from random import choice
 from camera import *
+from weapon import Weapon
 
 
 class Level:
@@ -44,15 +47,17 @@ class Level:
                         if style == 'object':
                             surf = graphics['objects'][int(col)]
                             Tile((x,y), [self.visible_sprites, self.obstacle_sprites], 'object', surf)
-        self.player = Player((1200, 1200), tuple([self.visible_sprites]), self.obstacle_sprites)
+        self.player = Player((1200, 1200), tuple([self.visible_sprites]), self.obstacle_sprites, self.create_attack)
+
+    def create_attack(self):
+        Weapon(self.player, [self.visible_sprites])
 
     def run(self):
         """Обнволение и отрисовка игры"""
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
         debug((self.player.rect.center))
-        # debug(self.test_tile.rect.center, y=40)
-        debug(self.visible_sprites.offset, y=80)
+        debug(self.player.status, y=40)
 
     def start(self):
         self.visible_sprites.start(self.player)
