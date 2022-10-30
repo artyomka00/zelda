@@ -11,17 +11,21 @@ class Game:
         self.level = Level()
 
     def run(self):
+        self.level.start()
         while True:
+            # print(self.level.player.rect.center)
+            # print(self.level.display_surface.get_size())
+            # print(self.level.visible_sprites.offset)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                print(event.type)
 
             self.screen.fill('black')
             self.level.run()
             pygame.display.update()
             self.clock.tick(FPS)
-
 
 if __name__ == '__main__':
     game = Game()

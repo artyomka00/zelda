@@ -2,7 +2,7 @@
 General setup game
 """
 WIDTH = 1280
-HEIGTH = 720
+HEIGTH = 600
 FPS = 60
 TILESIZE = 64
 WORLD_MAP = [
