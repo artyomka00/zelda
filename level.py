@@ -31,7 +31,7 @@ class Level:
         """Обнволение и отрисовка игры"""
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
-        debug((self.player.rect.x, self.player.rect.y))
+        debug((self.player.hitbox.top))
         debug(self.visible_sprites.length,y=40)
 
 class YSortCameraGroup(pygame.sprite.Group):
@@ -43,7 +43,7 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.length = 0
         self.hieght = 0
 
-    def custom_draw(self, player:pygame.sprite.Sprite):
+    def custom_draw(self, player):
         if player.rect.right > self.display_surface.get_size()[0]:
             self.offset.x = -1
         if player.rect.left < 0:
@@ -63,8 +63,9 @@ class YSortCameraGroup(pygame.sprite.Group):
 
         #self.offset.x = palyer.rect.centerx - self.half_width
         #self.offset.y = palyer.rect.centery - self.half_height
-        for sprite in self.sprites():
+        for sprite in sorted(self.sprites(), key= lambda sprite: sprite.rect.centery):
             sprite.rect.topleft += self.offset * self.speed_screen
+            sprite.hitbox.center = sprite.rect.center
             offset_pos = sprite.rect.topleft + self.offset
             self.display_surface.blit(sprite.image,sprite.rect.topleft)
 
