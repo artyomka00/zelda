@@ -4,7 +4,7 @@ from support import *
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, obstacle_sprites, create_attack):
+    def __init__(self, pos, groups, obstacle_sprites, create_attack, destroy_attack):
         super().__init__(groups)
         self.image = pygame.image.load('graphics/test/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
@@ -18,13 +18,27 @@ class Player(pygame.sprite.Sprite):
 
         # moving setup
         self.direction = pygame.math.Vector2()
-        self.speed = 5
         self.attacking = False
         self.cooldawn = 400
         self.attack_time = 0
-        self.create_attack = create_attack
+
+        # stats
+        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 6}
+        self.healtf = self.stats['health']
+        self.energy = self.stats['energy']
+        self.speed = self.stats['speed']
+        self.exp = 0
 
         self.obstacle_sprites = obstacle_sprites
+
+        # weapon
+        self.create_attack = create_attack
+        self.destroy_attac = destroy_attack
+        self.weapon_index = 0
+        self.weapon = list(weapon_data.keys())[self.weapon_index]
+        self.swich_weapon_colldown = 200
+        self.swich_weapon = True
+        self.swich_weapon_time = 0
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -56,6 +70,15 @@ class Player(pygame.sprite.Sprite):
             if keys[pygame.K_RCTRL]:
                 self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
+
+            if keys[pygame.K_PERIOD] and self.swich_weapon:
+                self.swich_weapon = False
+                if self.weapon_index < len(weapon_data.keys()) - 1:
+                    self.weapon_index += 1
+                else:
+                    self.weapon_index = 0
+                self.swich_weapon_time = pygame.time.get_ticks()
+                self.weapon = list(weapon_data.keys())[self.weapon_index]
 
         # magic input
 
@@ -109,8 +132,13 @@ class Player(pygame.sprite.Sprite):
 
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
-        if current_time - self.attack_time >= self.cooldawn:
-            self.attacking = False
+        if self.attacking:
+            if current_time - self.attack_time >= self.cooldawn:
+                self.destroy_attac()
+                self.attacking = False
+        if not self.swich_weapon:
+            if current_time - self.swich_weapon_time >= self.swich_weapon_colldown:
+                self.swich_weapon = True
 
     def animate(self):
         animation = self.animations[self.status]

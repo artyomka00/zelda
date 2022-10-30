@@ -8,18 +8,29 @@ from debug import debug
 from support import *
 from random import choice
 from camera import *
+from ui import UI
 from weapon import Weapon
 
 
 class Level:
     def __init__(self):
         """Спрайты видимые и невидимые"""
-        self.player = None
+        # get display
         self.display_surface = pygame.display.get_surface()
 
+        # sprite group setup
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
+
+        # attack sprite
+        self.current_attack = None
+
+        # sprite setup
+        self.player = None
         self.create_map()
+
+        # user interface
+        self.ui = UI()
 
     def create_map(self):
         layouts = {
@@ -47,17 +58,23 @@ class Level:
                         if style == 'object':
                             surf = graphics['objects'][int(col)]
                             Tile((x,y), [self.visible_sprites, self.obstacle_sprites], 'object', surf)
-        self.player = Player((1200, 1200), tuple([self.visible_sprites]), self.obstacle_sprites, self.create_attack)
+        self.player = Player((1200, 1200), tuple([self.visible_sprites]), self.obstacle_sprites, self.create_attack,
+                             self.destroy_weapon)
 
     def create_attack(self):
-        Weapon(self.player, [self.visible_sprites])
+        self.current_attack = Weapon(self.player, [self.visible_sprites])
 
+    def destroy_weapon(self):
+        if self.current_attack:
+            self.current_attack.kill()
+            self.current_attack = None
     def run(self):
         """Обнволение и отрисовка игры"""
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
-        debug((self.player.rect.center))
-        debug(self.player.status, y=40)
+        self.ui.display(self.player)
+        # debug((self.player.rect.center))
+        # debug(self.player.weapon_index, y=40)
 
     def start(self):
         self.visible_sprites.start(self.player)
