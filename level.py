@@ -42,6 +42,9 @@ class YSortCameraGroup(pygame.sprite.Group):
         self.speed_screen = 40
         self.length = 0
         self.hieght = 0
+        self.floor_surf = pygame.image.load('graphics/tilemap/ground.png').convert()
+        self.flor_rect = self.floor_surf.get_rect(topleft=(0,0))
+
 
     def custom_draw(self, player):
         if player.rect.right > self.display_surface.get_size()[0]:
@@ -61,8 +64,9 @@ class YSortCameraGroup(pygame.sprite.Group):
             self.hieght = 0
             self.offset.y = 0
 
-        #self.offset.x = palyer.rect.centerx - self.half_width
-        #self.offset.y = palyer.rect.centery - self.half_height
+
+        self.flor_rect.topleft += self.offset * self.speed_screen
+        self.display_surface.blit(self.floor_surf, self.flor_rect)
         for sprite in sorted(self.sprites(), key= lambda sprite: sprite.rect.centery):
             sprite.rect.topleft += self.offset * self.speed_screen
             sprite.hitbox.center = sprite.rect.center
