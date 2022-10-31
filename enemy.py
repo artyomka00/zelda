@@ -77,7 +77,6 @@ class Enemy(Entity):
         if self.status == 'attack':
             self.attack_time = pygame.time.get_ticks()
             self.damage_player(self.attack_damage, self.attack_type)
-            print('attack')
         elif self.status == 'move':
             self.direction = self.get_player_distanse_direction(player)[1]
 

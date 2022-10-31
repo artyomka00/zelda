@@ -23,12 +23,12 @@ class Player(Entity):
 
         # stats
         self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 6}
-        self.max_stats = {'health': 300, 'energy': 180, 'attack': 20, 'magic': 10, 'speed': 9}
-        self.upgrate_stats = {'health': 100, 'energy': 100, 'attack': 100, 'magic': 100, 'speed': 100}
+        self.max_stats = {'health': 300, 'energy': 180, 'attack': 20, 'magic': 10, 'speed': 10}
+        self.upgrade_cost = {'health': 100, 'energy': 100, 'attack': 100, 'magic': 100, 'speed': 100}
         self.healtf = self.stats['health']
         self.energy = self.stats['energy']
         self.speed = self.stats['speed']
-        self.exp = 500
+        self.exp = 5000
 
         # weapon
         self.create_attack = create_attack
@@ -189,4 +189,4 @@ class Player(Entity):
         self.get_status()
         self.animate()
         self.magic_recovery()
-        self.move(self.speed)
+        self.move(self.stats['speed'])

@@ -146,6 +146,6 @@ class Level:
             self.visible_sprites.update()
             self.visible_sprites.enemy_update(self.player)
             self.player_attack_logic()
-        debug((self.upgrade.input()))
+        # debug((self.upgrade.input()))
         # debug(self.player.weapon_index, y=40)
 
