@@ -1,8 +1,15 @@
 from csv import reader
 from os import walk
+import pygame
+import ctypes
 
-import pygame.image
-
+def set_screen_prop():
+    user32 = ctypes.windll.user32
+    screenSize =  user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+    print(screenSize)
+    size = (screenSize)
+    pygame.display.set_caption("Window")
+    return pygame.display.set_mode((size) , pygame.FULLSCREEN)
 
 def import_csv_layout(path):
     terrain_map = []

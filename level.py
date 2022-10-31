@@ -15,6 +15,7 @@ from ui import UI
 from weapon import Weapon
 from particles import *
 from magic import *
+from upgrade import Upgrade
 
 
 class Level:
@@ -22,6 +23,7 @@ class Level:
         """Спрайты видимые и невидимые"""
         # get display
         self.display_surface = pygame.display.get_surface()
+        self.game_paused = False
 
         # sprite group setup
         self.visible_sprites = YSortCameraGroup()
@@ -38,6 +40,7 @@ class Level:
 
         # user interface
         self.ui = UI()
+        self.upgrade = Upgrade(self.player)
 
         # particles
         self.animation_player = AnimationPlayer()
@@ -85,7 +88,8 @@ class Level:
                                 else:
                                     monster_name = 'squid'
                                 Enemy(monster_name, (x, y), [self.visible_sprites, self.attackable_sprites],
-                                      self.obstacle_sprites, self.damage_player, self.triger_death_paarticles)
+                                      self.obstacle_sprites, self.damage_player, self.triger_death_paarticles,
+                                      self.add_exp)
 
     def create_attack(self):
         self.current_attack = Weapon(self.player, [self.visible_sprites, self.attack_sprites])
@@ -94,16 +98,15 @@ class Level:
         if style == 'heal':
             self.magic_player.heal(self.player, strength, cost, [self.visible_sprites])
         if style == 'flame':
-            pass
-
-        print(style)
-        print(strength)
-        print(cost)
+            self.magic_player.flame(self.player,cost,[self.visible_sprites, self.attack_sprites])
 
     def destroy_weapon(self):
         if self.current_attack:
             self.current_attack.kill()
             self.current_attack = None
+
+    def add_exp(self, amount):
+        self.player.exp += amount
 
     def player_attack_logic(self):
         if self.attack_sprites:
@@ -120,7 +123,6 @@ class Level:
                         else:
                             target_srite.get_damage(self.player, attack_sprite.sprite_type)
 
-
     def triger_death_paarticles(self, pos, particle_type):
         self.animation_player.create_particle(particle_type,pos, self.visible_sprites)
 
@@ -131,17 +133,19 @@ class Level:
             self.player.hurt_time = pygame.time.get_ticks()
             self.animation_player.create_particle(attack_type,self.player.rect.center, self.visible_sprites)
 
+    def toggle_menu(self):
+        self.game_paused = not self.game_paused
 
     def run(self):
         """Обнволение и отрисовка игры"""
         self.visible_sprites.custom_draw(self.player)
-        self.visible_sprites.update()
-        self.visible_sprites.enemy_update(self.player)
-        self.player_attack_logic()
         self.ui.display(self.player)
-        # debug((self.player.rect.center))
+        if self.game_paused:
+            self.upgrade.display()
+        else:
+            self.visible_sprites.update()
+            self.visible_sprites.enemy_update(self.player)
+            self.player_attack_logic()
+        debug((self.upgrade.input()))
         # debug(self.player.weapon_index, y=40)
 
-    def start(self):
-        self.visible_sprites.start(self.player)
-        self.visible_sprites.update()

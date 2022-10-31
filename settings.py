@@ -1,8 +1,8 @@
 """
 General setup game
 """
-WIDTH = 1720
-HEIGTH = 840
+WIDTH = 1200
+HEIGTH = 620
 FPS = 60
 TILESIZE = 64
 
@@ -20,7 +20,13 @@ UI_BORDER_COLOR_ACTIVE = 'gold'
 WATER_COLOR = '#71ddee'
 UI_BG_COLOR = '#222222'
 UI_BORDER_COLOR = '#111111'
-TETX_COLOR = '#EEEEEE'
+TEXT_COLOR = '#EEEEEE'
+
+# upgrade menu
+TEXT_COLOR_SELECTION = '#111111'
+BAR_COLOR = '#EEEEEE'
+BAR_COLOR_SELECTION = '#111111'
+UPGRADE_BG_COLOR_SELECTION = '#EEEEEE'
 
 weapon_data = {
     'sword': {'cooldown': 100, 'damage': 15, 'graphic': 'graphics/weapons/sword/full.png'},

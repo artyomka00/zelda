@@ -5,7 +5,7 @@ from support import *
 
 
 class Enemy(Entity):
-    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, triger_death_particles):
+    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, triger_death_particles,add_exp):
         super().__init__(groups)
         self.sprite_type = 'enemy'
 
@@ -37,6 +37,7 @@ class Enemy(Entity):
         self.attack_cooldown = 400
         self.damage_player = damage_player
         self.triger_death_particle = triger_death_particles
+        self.add_exp = add_exp
 
         # invincibility time
         self.vulnerable = True  # может ли существо получать урон
@@ -116,7 +117,7 @@ class Enemy(Entity):
             if attack_type == 'weapon':
                 self.health -= player.get_weapon_damage()
             else:
-                pass
+                self.health -= player.get_magic_damage()
             self.hit_time = pygame.time.get_ticks()
             self.vulnerable = False
 
@@ -124,6 +125,7 @@ class Enemy(Entity):
         if self.health <= 0:
             self.kill()
             self.triger_death_particle(self.rect.center, self.monster_name)
+            self.add_exp(self.exp)
 
     def hit_reaction(self):
         if not self.vulnerable:

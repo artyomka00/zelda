@@ -23,10 +23,12 @@ class Player(Entity):
 
         # stats
         self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 6}
+        self.max_stats = {'health': 300, 'energy': 180, 'attack': 20, 'magic': 10, 'speed': 9}
+        self.upgrate_stats = {'health': 100, 'energy': 100, 'attack': 100, 'magic': 100, 'speed': 100}
         self.healtf = self.stats['health']
         self.energy = self.stats['energy']
         self.speed = self.stats['speed']
-        self.exp = 0
+        self.exp = 500
 
         # weapon
         self.create_attack = create_attack
@@ -135,6 +137,15 @@ class Player(Entity):
         damage = self.stats['attack'] + weapon_data[self.weapon]['damage']
         return damage
 
+    def get_magic_damage(self):
+        damage = self.stats['magic'] + magic_data[self.magic]['strength']
+        return damage
+
+    def magic_recovery(self):
+        if self.energy < self.stats['energy']:
+            self.energy += 0.012 * self.stats['magic']
+
+
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
         # cooldown attack
@@ -177,4 +188,5 @@ class Player(Entity):
         self.cooldowns()
         self.get_status()
         self.animate()
+        self.magic_recovery()
         self.move(self.speed)
