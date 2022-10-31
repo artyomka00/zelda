@@ -1,3 +1,5 @@
+import random
+
 import pygame
 
 import weapon
@@ -7,10 +9,12 @@ from tile import Tile
 from player import Player
 from debug import debug
 from support import *
-from random import choice
+from random import choice, randint
 from camera import *
 from ui import UI
 from weapon import Weapon
+from particles import *
+from magic import *
 
 
 class Level:
@@ -34,6 +38,10 @@ class Level:
 
         # user interface
         self.ui = UI()
+
+        # particles
+        self.animation_player = AnimationPlayer()
+        self.magic_player = MagicPlayer(self.animation_player)
 
     def create_map(self):
         layouts = {
@@ -77,12 +85,17 @@ class Level:
                                 else:
                                     monster_name = 'squid'
                                 Enemy(monster_name, (x, y), [self.visible_sprites, self.attackable_sprites],
-                                      self.obstacle_sprites, self.damage_player)
+                                      self.obstacle_sprites, self.damage_player, self.triger_death_paarticles)
 
     def create_attack(self):
         self.current_attack = Weapon(self.player, [self.visible_sprites, self.attack_sprites])
 
     def create_magic(self, style, strength, cost):
+        if style == 'heal':
+            self.magic_player.heal(self.player, strength, cost, [self.visible_sprites])
+        if style == 'flame':
+            pass
+
         print(style)
         print(strength)
         print(cost)
@@ -99,16 +112,25 @@ class Level:
                 if collision_sprite:
                     for target_srite in collision_sprite:
                         if target_srite.sprite_type == 'grass':
+                            pos = target_srite.rect.center
+                            offset = pygame.math.Vector2(0, 75)
+                            for ieaf in range(randint(3,6)):
+                                self.animation_player.create_grass_particle(pos - offset, [self.visible_sprites])
                             target_srite.kill()
                         else:
                             target_srite.get_damage(self.player, attack_sprite.sprite_type)
+
+
+    def triger_death_paarticles(self, pos, particle_type):
+        self.animation_player.create_particle(particle_type,pos, self.visible_sprites)
 
     def damage_player(self, amount, attack_type):
         if self.player.vulnerable:
             self.player.healtf -= amount
             self.player.vulnerable = False
             self.player.hurt_time = pygame.time.get_ticks()
-            # spawn particles
+            self.animation_player.create_particle(attack_type,self.player.rect.center, self.visible_sprites)
+
 
     def run(self):
         """Обнволение и отрисовка игры"""
