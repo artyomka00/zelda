@@ -1,5 +1,6 @@
 import pygame
 from settings import *
+from enemy import Enemy
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
@@ -66,4 +67,8 @@ class YSortCameraGroup(pygame.sprite.Group):
             # sprite.hitbox.center = sprite.rect.center
             self.display_surface.blit(sprite.image, offset_sprite)
 
+    def enemy_update(self, player):
+        ememy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'enemy']
+        for enemy in ememy_sprites:
+            enemy.enemy_update(player)
 

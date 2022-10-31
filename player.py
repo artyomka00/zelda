@@ -10,6 +10,7 @@ class Player(Entity):
         self.image = pygame.image.load('graphics/test/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
         self.hitbox = self.rect.inflate(0, -26)
+        self.obstacle_sprites = obstacle_sprites
 
         # graphics setup
         self.import_player_assets()
@@ -27,8 +28,6 @@ class Player(Entity):
         self.speed = self.stats['speed']
         self.exp = 0
 
-        self.obstacle_sprites = obstacle_sprites
-
         # weapon
         self.create_attack = create_attack
         self.destroy_attac = destroy_attack
@@ -45,6 +44,11 @@ class Player(Entity):
         self.switch_magic = True
         self.switch_magic_time = 0
         self.switch_magic_cooldown = 200
+
+        # enemy damage
+        self.vulnerable = True
+        self.hurt_time = None
+        self.invulnerability_duration = 500
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -69,18 +73,18 @@ class Player(Entity):
 
             # attaking input
             if keys[pygame.K_SPACE]:
-                self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
                 self.create_attack()
+                self.attacking = True
 
             # magic attack
             if keys[pygame.K_RCTRL]:
-                self.attacking = True
                 self.attack_time = pygame.time.get_ticks()
                 style = list(magic_data.keys())[self.magic_index]
                 strength = magic_data[style]['strength'] + self.stats['magic']
                 cost = magic_data[style]['cost']
                 self.create_magic(style, strength, cost)
+                self.attacking = True
 
             # switch weapon
             if keys[pygame.K_COMMA] and self.switch_weapon:
@@ -127,13 +131,20 @@ class Player(Entity):
             full_path = character_path + animation
             self.animations[animation] = import_folder(full_path)
 
+    def get_weapon_damage(self):
+        damage = self.stats['attack'] + weapon_data[self.weapon]['damage']
+        return damage
+
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
         # cooldown attack
         if self.attacking:
-            if current_time - self.attack_time >= self.cooldawn:
+            if current_time - self.attack_time >= self.cooldawn + weapon_data[self.weapon]['cooldown']:
                 self.destroy_attac()
                 self.attacking = False
+        if not self.vulnerable:
+            if current_time - self.hurt_time >= self.invulnerability_duration:
+                self.vulnerable = True
 
         # cooldown switch weapon
         if not self.switch_weapon:
@@ -153,6 +164,13 @@ class Player(Entity):
 
         self.image = animation[int(self.frame_index)]
         self.rect = self.image.get_rect(center=self.hitbox.center)
+
+        # flicker
+        if not self.vulnerable:
+            alpha = self.wave_value()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
 
     def update(self):
         self.input()
