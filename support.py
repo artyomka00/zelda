@@ -10,10 +10,9 @@ def set_screen_prop():
     print(screenSize)
     size = (screenSize)
     pygame.display.set_caption("Window")
-    if size[0] > WIDTH or size[1] > HEIGTH:
-        return pygame.display.set_mode((WIDTH, HEIGTH),pygame.FULLSCREEN, pygame.NOFRAME)
-    else:
-        return pygame.display.set_mode((size) , pygame.FULLSCREEN)
+    width = min(size[0], WIDTH)
+    heigth = min(size[1], HEIGTH)
+    return pygame.display.set_mode((width,heigth), pygame.FULLSCREEN)
 
 def import_csv_layout(path):
     terrain_map = []
