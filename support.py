@@ -2,6 +2,7 @@ from csv import reader
 from os import walk
 import pygame
 import ctypes
+from settings import *
 
 def set_screen_prop():
     user32 = ctypes.windll.user32
@@ -9,7 +10,10 @@ def set_screen_prop():
     print(screenSize)
     size = (screenSize)
     pygame.display.set_caption("Window")
-    return pygame.display.set_mode((size) , pygame.FULLSCREEN)
+    if size[0] > WIDTH or size[1] > HEIGTH:
+        return pygame.display.set_mode((WIDTH, HEIGTH),pygame.FULLSCREEN, pygame.NOFRAME)
+    else:
+        return pygame.display.set_mode((size) , pygame.FULLSCREEN)
 
 def import_csv_layout(path):
     terrain_map = []

@@ -1,8 +1,8 @@
 """
 General setup game
 """
-WIDTH = 1200
-HEIGTH = 620
+WIDTH = 1280
+HEIGTH = 720
 FPS = 60
 TILESIZE = 64
 HITBOX_OFFSET = {
