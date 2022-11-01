@@ -6,17 +6,18 @@ class Game:
     def __init__(self):
         #general setup
         pygame.init()
-        # self.screen = set_screen_prop()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGTH))
+        self.screen = set_screen_prop()
+        # self.screen = pygame.display.set_mode((WIDTH, HEIGTH))
         pygame.display.set_caption('Zelda')
         self.clock = pygame.time.Clock()
         self.level = Level()
+        self.sound = pygame.mixer.Sound('audio/main.ogg')
+        self.sound.set_volume(0.2)
+        self.sound.play(loops=-1)
+
 
     def run(self):
         while True:
-            # print(self.level.player.rect.center)
-            # print(self.level.display_surface.get_size())
-            # print(self.level.visible_sprites.offset)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -29,9 +30,10 @@ class Game:
                         sys.exit()
 
             self.screen.fill(WATER_COLOR)
-            self.level.run()
+            self.level.run(int(self.clock.get_fps()))
             pygame.display.update()
             self.clock.tick(FPS)
+
 
 if __name__ == '__main__':
     game = Game()

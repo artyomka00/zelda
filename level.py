@@ -136,7 +136,7 @@ class Level:
     def toggle_menu(self):
         self.game_paused = not self.game_paused
 
-    def run(self):
+    def run(self, fps):
         """Обнволение и отрисовка игры"""
         self.visible_sprites.custom_draw(self.player)
         self.ui.display(self.player)
@@ -147,5 +147,5 @@ class Level:
             self.visible_sprites.enemy_update(self.player)
             self.player_attack_logic()
         # debug((self.upgrade.input()))
-        # debug(self.player.weapon_index, y=40)
+        debug(fps, y=100)
 
